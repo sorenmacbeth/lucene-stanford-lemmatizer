@@ -1,7 +1,6 @@
-class/
-javadoc/
-*.jar
-
-# Vim temporaries
-*.swp
-*.swo
+pom.xml
+*jar
+/lib/
+/classes/
+.lein-failures
+.lein-deps-sum
