@@ -1,4 +1,4 @@
-(defproject org.clojars.sorenmacbeth/lucene-standford-lemmatizer "0.1-SNAPSHOT"
+(defproject org.clojars.sorenmacbeth/lucene-stanford-lemmatizer "0.1-SNAPSHOT"
   :java-source-path "src"
   :javac-options {:debug "true" :fork "true"}
   :dependencies [[org.apache.lucene/lucene-core "3.4.0"]
