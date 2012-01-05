@@ -27,7 +27,7 @@ import edu.stanford.nlp.process.Morphology;
 import edu.stanford.nlp.tagger.maxent.MaxentTagger;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
-import org.apache.lucene.analysis.tokenattributes.TermAttribute;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 
 /**
  * A tokenizer that retrieves the lemmas (base forms) of English words.
@@ -41,7 +41,7 @@ public class EnglishLemmaTokenizer extends TokenStream {
     private Iterator<TaggedWord> tagged;
     private PositionIncrementAttribute posIncr;
     private TaggedWord currentWord;
-    private TermAttribute termAtt;
+    private CharTermAttribute termAtt;
     private boolean lemmaNext;
 
     /**
@@ -61,7 +61,7 @@ public class EnglishLemmaTokenizer extends TokenStream {
 
         lemmaNext = false;
         posIncr = addAttribute(PositionIncrementAttribute.class);
-        termAtt = addAttribute(TermAttribute.class);
+        termAtt = addAttribute(CharTermAttribute.class);
 
         List<List<HasWord>> tokenized =
             MaxentTagger.tokenizeText(input);
@@ -81,7 +81,7 @@ public class EnglishLemmaTokenizer extends TokenStream {
             posIncr.setPositionIncrement(1);
             String tag  = currentWord.tag();
             String form = currentWord.word();
-            termAtt.setTermBuffer(Morphology.stemStatic(form, tag).word());
+            termAtt.append(Morphology.stemStatic(form, tag).word());
         } else {
             // Emit inflected form, if not filtered out.
 
@@ -97,7 +97,7 @@ public class EnglishLemmaTokenizer extends TokenStream {
             }
 
             posIncr.setPositionIncrement(increment);
-            termAtt.setTermBuffer(currentWord.word());
+            termAtt.append(currentWord.word());
         }
 
         lemmaNext = !lemmaNext;
