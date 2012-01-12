@@ -81,6 +81,7 @@ public class EnglishLemmaTokenizer extends TokenStream {
             posIncr.setPositionIncrement(1);
             String tag  = currentWord.tag();
             String form = currentWord.word();
+            termAtt.setEmpty();
             termAtt.append(Morphology.stemStatic(form, tag).word());
         } else {
             // Emit inflected form, if not filtered out.
@@ -97,6 +98,7 @@ public class EnglishLemmaTokenizer extends TokenStream {
             }
 
             posIncr.setPositionIncrement(increment);
+            termAtt.setEmpty();
             termAtt.append(currentWord.word());
         }
 
