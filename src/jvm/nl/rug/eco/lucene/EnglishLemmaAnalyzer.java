@@ -22,7 +22,7 @@ import java.io.*;
 import edu.stanford.nlp.tagger.maxent.MaxentTagger;
 import edu.stanford.nlp.tagger.maxent.TaggerConfig;
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.Analyzer.TokenStreamComponents;
 
 /**
  * An analyzer that uses an {@link EnglishLemmaTokenizer}.
@@ -46,7 +46,7 @@ public class EnglishLemmaAnalyzer extends Analyzer {
     public EnglishLemmaAnalyzer(MaxentTagger tagger) {
         posTagger = tagger;
     }
-
+    
     /**
      * Factory method for loading a POS tagger.
      */
@@ -57,7 +57,7 @@ public class EnglishLemmaAnalyzer extends Analyzer {
     }
 
     @Override
-    public TokenStream tokenStream(String fieldName, Reader input) {
-        return new EnglishLemmaTokenizer(input, posTagger);
+    protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
+        return new TokenStreamComponents(new EnglishLemmaTokenizer(reader, posTagger));
     }
 }

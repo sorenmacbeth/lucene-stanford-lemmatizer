@@ -25,7 +25,7 @@ import com.google.common.collect.Iterables;
 import edu.stanford.nlp.ling.*;
 import edu.stanford.nlp.process.Morphology;
 import edu.stanford.nlp.tagger.maxent.MaxentTagger;
-import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 
@@ -37,7 +37,7 @@ import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
  * @author  Lars Buitinck
  * @version 2011.0122
  */
-public class EnglishLemmaTokenizer extends TokenStream {
+public class EnglishLemmaTokenizer extends Tokenizer {
     private Iterator<TaggedWord> tagged;
     private PositionIncrementAttribute posIncr;
     private TaggedWord currentWord;
@@ -57,7 +57,7 @@ public class EnglishLemmaTokenizer extends TokenStream {
      * Construct a tokenizer processing the given input using the given tagger.
      */
     public EnglishLemmaTokenizer(Reader input, MaxentTagger tagger) {
-        super();
+        super(input);
 
         lemmaNext = false;
         posIncr = addAttribute(PositionIncrementAttribute.class);
