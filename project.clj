@@ -1,4 +1,4 @@
-(defproject org.clojars.sorenmacbeth/lucene-stanford-lemmatizer "0.1.3"
+(defproject org.clojars.sorenmacbeth/lucene-stanford-lemmatizer "0.1.4"
   :source-path "src/clj"
   :java-source-path "src/jvm"
   :javac-options {:debug "true" :fork "true" :deprecation "true"}

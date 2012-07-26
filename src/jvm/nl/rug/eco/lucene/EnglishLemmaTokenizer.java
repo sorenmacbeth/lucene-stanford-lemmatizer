@@ -38,10 +38,13 @@ import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
  * @version 2011.0122
  */
 public class EnglishLemmaTokenizer extends Tokenizer {
+
+    private MaxentTagger _tagger;
     private Iterator<TaggedWord> tagged;
     private PositionIncrementAttribute posIncr;
     private TaggedWord currentWord;
     private CharTermAttribute termAtt;
+    private PartOfSpeechAttribute posAtt;
     private boolean lemmaNext;
 
     /**
@@ -58,14 +61,16 @@ public class EnglishLemmaTokenizer extends Tokenizer {
      */
     public EnglishLemmaTokenizer(Reader input, MaxentTagger tagger) {
         super(input);
-
-        lemmaNext = false;
+        
         posIncr = addAttribute(PositionIncrementAttribute.class);
         termAtt = addAttribute(CharTermAttribute.class);
+        posAtt = addAttribute(PartOfSpeechAttribute.class);
 
-        List<List<HasWord>> tokenized =
-            MaxentTagger.tokenizeText(input);
-        tagged = Iterables.concat(tagger.process(tokenized)).iterator();
+        _tagger = tagger;
+        List<List<HasWord>> tokenized = MaxentTagger.tokenizeText(input);
+        tagged = Iterables.concat(_tagger.process(tokenized)).iterator();
+        lemmaNext = false;
+
     }
 
     /**
@@ -76,6 +81,8 @@ public class EnglishLemmaTokenizer extends Tokenizer {
      */
     @Override
     public final boolean incrementToken() throws IOException {
+        clearAttributes();
+
         if (lemmaNext) {
             // Emit a lemma
             posIncr.setPositionIncrement(1);
@@ -100,10 +107,20 @@ public class EnglishLemmaTokenizer extends Tokenizer {
             posIncr.setPositionIncrement(increment);
             termAtt.setEmpty();
             termAtt.append(currentWord.word());
+            posAtt.setPartOfSpeech(currentWord.tag());
         }
 
         lemmaNext = !lemmaNext;
         return true;
+    }
+
+    @Override
+    public void reset(Reader input) throws IOException {
+        super.reset(input);
+
+        List<List<HasWord>> tokenized = MaxentTagger.tokenizeText(input);
+        tagged = Iterables.concat(_tagger.process(tokenized)).iterator();
+        lemmaNext = false;
     }
 
     private static final Pattern unwantedPosRE = Pattern.compile(
