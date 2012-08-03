@@ -32,6 +32,7 @@ import org.apache.lucene.analysis.Analyzer.TokenStreamComponents;
  */
 public class EnglishLemmaAnalyzer extends Analyzer {
     private MaxentTagger posTagger;
+    private String _unwantedPOS;
 
     /**
      * Construct an analyzer with a tagger using the given model file.
@@ -47,6 +48,20 @@ public class EnglishLemmaAnalyzer extends Analyzer {
         posTagger = tagger;
     }
     
+     /**
+     * Construct an analyzer with a tagger using the given model file.
+     */
+    public EnglishLemmaAnalyzer(String posModelFile, String unwantedPOS) throws Exception {
+        this(makeTagger(posModelFile), unwantedPOS);
+    }
+
+    /**
+     * Construct an analyzer using the given tagger.
+     */
+    public EnglishLemmaAnalyzer(MaxentTagger tagger, String unwantedPOS) {
+        posTagger = tagger;
+        _unwantedPOS = unwantedPOS;
+    }
     /**
      * Factory method for loading a POS tagger.
      */
@@ -58,6 +73,10 @@ public class EnglishLemmaAnalyzer extends Analyzer {
 
     @Override
     protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
-        return new TokenStreamComponents(new EnglishLemmaTokenizer(reader, posTagger));
+        if(_unwantedPOS != null) {
+            return new TokenStreamComponents(new EnglishLemmaTokenizer(reader, posTagger, _unwantedPOS));
+        } else {
+            return new TokenStreamComponents(new EnglishLemmaTokenizer(reader, posTagger));
+        }
     }
 }

@@ -34,8 +34,6 @@ import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
  * Relies internally on the sentence splitter and tokenizer supplied with
  * the Stanford POS tagger.
  *
- * @author  Lars Buitinck
- * @version 2011.0122
  */
 public class EnglishLemmaTokenizer extends Tokenizer {
 
@@ -46,6 +44,7 @@ public class EnglishLemmaTokenizer extends Tokenizer {
     private CharTermAttribute termAtt;
     private PartOfSpeechAttribute posAtt;
     private boolean lemmaNext;
+    private Pattern unwantedPosRE;
 
     /**
      * Construct a tokenizer processing the given input and a tagger
@@ -54,6 +53,11 @@ public class EnglishLemmaTokenizer extends Tokenizer {
     public EnglishLemmaTokenizer(Reader input, String posModelFile)
             throws Exception {
         this(input, EnglishLemmaAnalyzer.makeTagger(posModelFile));
+    }
+
+    public EnglishLemmaTokenizer(Reader input, String posModelFile, String unwantedPOS)
+            throws Exception {
+        this(input, EnglishLemmaAnalyzer.makeTagger(posModelFile), unwantedPOS);
     }
 
     /**
@@ -70,6 +74,22 @@ public class EnglishLemmaTokenizer extends Tokenizer {
         List<List<HasWord>> tokenized = MaxentTagger.tokenizeText(input);
         tagged = Iterables.concat(_tagger.process(tokenized)).iterator();
         lemmaNext = false;
+        unwantedPosRE = Pattern.compile("^(CC|DT|[LR]RB|MD|POS|PRP|UH|WDT|WP|WP\\$|WRB|\\$|\\#|\\.|\\,|:)$");
+
+    }
+
+    public EnglishLemmaTokenizer(Reader input, MaxentTagger tagger, String unwantedPOS) {
+        super(input);
+        
+        posIncr = addAttribute(PositionIncrementAttribute.class);
+        termAtt = addAttribute(CharTermAttribute.class);
+        posAtt = addAttribute(PartOfSpeechAttribute.class);
+
+        _tagger = tagger;
+        List<List<HasWord>> tokenized = MaxentTagger.tokenizeText(input);
+        tagged = Iterables.concat(_tagger.process(tokenized)).iterator();
+        lemmaNext = false;
+        unwantedPosRE = Pattern.compile(unwantedPOS);
 
     }
 
@@ -122,10 +142,6 @@ public class EnglishLemmaTokenizer extends Tokenizer {
         tagged = Iterables.concat(_tagger.process(tokenized)).iterator();
         lemmaNext = false;
     }
-
-    private static final Pattern unwantedPosRE = Pattern.compile(
-      "^(CC|DT|[LR]RB|MD|POS|PRP|UH|WDT|WP|WP\\$|WRB|\\$|\\#|\\.|\\,|:)$"
-    );
 
     /**
      * Determines if words with a given POS tag should be omitted from the
