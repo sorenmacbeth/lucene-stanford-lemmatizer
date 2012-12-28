@@ -135,8 +135,8 @@ public class EnglishLemmaTokenizer extends Tokenizer {
     }
 
     @Override
-    public void reset(Reader input) throws IOException {
-        super.reset(input);
+    public void reset() throws IOException {
+        super.reset();
 
         List<List<HasWord>> tokenized = MaxentTagger.tokenizeText(input);
         tagged = Iterables.concat(_tagger.process(tokenized)).iterator();
